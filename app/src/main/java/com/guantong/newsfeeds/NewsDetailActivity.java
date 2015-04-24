@@ -1,6 +1,7 @@
 package com.guantong.newsfeeds;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -22,6 +23,7 @@ public class NewsDetailActivity extends Activity {
         WebSettings webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         webView.setWebViewClient(new WebViewClient());
+
         // Get the intent, setup ImageView and the ActionBar title
         NewsEntity result = (NewsEntity)(getIntent().getSerializableExtra("result"));
         webView.getSettings().setJavaScriptEnabled(true);

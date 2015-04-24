@@ -42,8 +42,6 @@ public class NewsAdapter extends ArrayAdapter<NewsEntity> {
         title.setText(newsEntity.getArticleTitle());
         desc.setText(newsEntity.getArticleDesc());
         imageViewUrl.setImageBitmap(newsEntity.getArticleImageUrl().getBitmap());
-//        SquareImageView imageView = (SquareImageView)v.findViewById(R.id.imageView);
-//        imageView.setImageBitmap(result.getMedia().getBitmap());
 
         return v;
     }

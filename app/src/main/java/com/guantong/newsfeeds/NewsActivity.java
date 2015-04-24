@@ -51,9 +51,8 @@ public class NewsActivity extends Activity {
                 // Using the Transition framework that was made available in Lollipop
                 Intent i = new Intent(NewsActivity.this, NewsDetailActivity.class);
                 i.putExtra("result", mResults.get(position));
-                ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(NewsActivity.this,
-                        view, "imageTransition");
-                startActivity(i, options.toBundle());
+                //ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(NewsActivity.this, view, "imageTransition");
+                startActivity(i);
             }
         });
 
@@ -99,7 +98,7 @@ public class NewsActivity extends Activity {
                 JSONObject feed = responseData.getJSONObject("feed");
                 JSONArray items = feed.getJSONArray("entries");
 
-                for(int i = 0; i < items.length(); i++) {
+                for(int i = 2; i < items.length(); i++) {
                     JSONObject item = items.getJSONObject(i);
 
                     // Get the article details e.g title snippet link imageUrl
@@ -109,12 +108,11 @@ public class NewsActivity extends Activity {
                     JSONArray mediaGroup = item.getJSONArray("mediaGroups");
                     JSONObject group0 = mediaGroup.getJSONObject(0);
                     JSONArray contents = group0.getJSONArray("contents");
-                    JSONObject content0 = contents.getJSONObject(0);
+                    JSONObject content2 = contents.getJSONObject(2);
 
-                    String articleDesc = content0.getString("description");
+                    String articleDesc = content2.getString("description");
 
-                    JSONArray thumbnail = content0.getJSONArray("thumbnails");
-                    String thumbnailImageUrl = thumbnail.getJSONObject(0).getString("url");
+                    String thumbnailImageUrl = content2.getString("url");
 
                     // Setup network request for image and decode into Bitmap
                     request = new HttpGet(thumbnailImageUrl);
