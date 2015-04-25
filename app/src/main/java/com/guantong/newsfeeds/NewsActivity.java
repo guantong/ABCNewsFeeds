@@ -17,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
+import org.apache.http.HttpException;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -67,9 +68,16 @@ public class NewsActivity extends Activity {
 
         @Override
         protected Void doInBackground(Void... voids) {
-            // Request our JSON data
-            DefaultHttpClient client = new DefaultHttpClient();
-            HttpGet request = new HttpGet(ABC_NEWS_FEED_URI);
+
+//            try {
+                // Request our JSON data
+                DefaultHttpClient client = new DefaultHttpClient();
+                HttpGet request = new HttpGet(ABC_NEWS_FEED_URI);
+//            }
+//            catch (HttpException http)
+//            {
+//
+//            }
 
             try {
                 // Execute the GET request and get input
@@ -98,7 +106,7 @@ public class NewsActivity extends Activity {
                 JSONObject feed = responseData.getJSONObject("feed");
                 JSONArray items = feed.getJSONArray("entries");
 
-                for(int i = 2; i < items.length(); i++) {
+                for(int i = 10; i < items.length(); i++) {
                     JSONObject item = items.getJSONObject(i);
 
                     // Get the article details e.g title snippet link imageUrl
@@ -127,6 +135,7 @@ public class NewsActivity extends Activity {
 
             } catch (Exception e) {
                 e.printStackTrace();
+
             }
             return null;
         }
