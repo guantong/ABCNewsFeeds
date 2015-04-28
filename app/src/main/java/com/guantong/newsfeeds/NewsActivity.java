@@ -5,19 +5,14 @@ import android.app.ActivityOptions;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.Image;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.GridView;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
-import org.apache.http.HttpException;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -29,13 +24,14 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 
 public class NewsActivity extends Activity {
-
     private static final String ABC_NEWS_FEED_URI
             = "http://ajax.googleapis.com/ajax/services/feed/load?v=1.0&q=http://www.abc.net.au/news/feed/51120/rss.xml&num=-1";
-
     private ListView listView;
     private ArrayList<NewsEntity> mResults;
     private NewsAdapter mAdapter;
@@ -45,6 +41,7 @@ public class NewsActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_news);
 
+        mResults = new ArrayList<>();
         listView = (ListView) findViewById(R.id.listView);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -52,32 +49,47 @@ public class NewsActivity extends Activity {
                 // Using the Transition framework that was made available in Lollipop
                 Intent i = new Intent(NewsActivity.this, NewsDetailActivity.class);
                 i.putExtra("result", mResults.get(position));
-                //ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(NewsActivity.this, view, "imageTransition");
-                startActivity(i);
+                ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(NewsActivity.this, view, "imageTransition");
+                startActivity(i, options.toBundle());
             }
         });
-
-        // Start download request
-        mResults = new ArrayList<>();
-        new NewsDownloadJSONTask().execute();
+        checkNetworkError();
     }
 
+    private void checkNetworkError(){
+        final NewsDownloadJSONTask t = new NewsDownloadJSONTask();
+        t.execute();
+//        // Start download request
+//        Thread thread = new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                try {
+//                    t.execute().get(300000, TimeUnit.MILLISECONDS);;
+//                } catch (Exception  e) {
+//                    t.cancel(true);
+//                    (NewsActivity.this).runOnUiThread(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            Toast.makeText(NewsActivity.this,"Network Error Please check your internet connection",Toast.LENGTH_LONG).show();
+//                            checkNetworkError();
+//                        }
+//                    });
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
+////        thread.start();
+
+    }
     private class NewsDownloadJSONTask extends AsyncTask<Void, Void, Void> {
         JSONObject json;
         ProgressBar progressBar;
 
         @Override
         protected Void doInBackground(Void... voids) {
-
-//            try {
                 // Request our JSON data
                 DefaultHttpClient client = new DefaultHttpClient();
                 HttpGet request = new HttpGet(ABC_NEWS_FEED_URI);
-//            }
-//            catch (HttpException http)
-//            {
-//
-//            }
 
             try {
                 // Execute the GET request and get input
@@ -106,7 +118,8 @@ public class NewsActivity extends Activity {
                 JSONObject feed = responseData.getJSONObject("feed");
                 JSONArray items = feed.getJSONArray("entries");
 
-                for(int i = 10; i < items.length(); i++) {
+                //change here according to valid jason objects
+                for(int i = 0; i < 4; i++) {
                     JSONObject item = items.getJSONObject(i);
 
                     // Get the article details e.g title snippet link imageUrl
@@ -134,8 +147,7 @@ public class NewsActivity extends Activity {
                 }
 
             } catch (Exception e) {
-                e.printStackTrace();
-
+                cancel(true);
             }
             return null;
         }
@@ -161,7 +173,6 @@ public class NewsActivity extends Activity {
             progressBar.setVisibility(View.GONE);
             // Make GridView visible again
             listView.setVisibility(View.VISIBLE);
-
         }
     }
 }
